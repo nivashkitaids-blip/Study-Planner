@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>Smart Study Planner</h1>
+      <p class="subtitle">Plan your study tasks easily</p>
+    </header>
+
+    <main>
+
+      <!-- ── Add Task Form ── -->
+      <section class="form-section">
+        <form id="task-form" novalidate>
+
+          <div class="form-group">
+            <label for="subject-input">Subject</label>
+            <input
+              type="text"
+              id="subject-input"
+              name="subject"
+              maxlength="100"
+              placeholder="e.g. Mathematics"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="task-input">Study Task</label>
+            <input
+              type="text"
+              id="task-input"
+              name="task"
+              maxlength="100"
+              placeholder="e.g. Read Chapter 5"
+              autocomplete="off"
+            />
+          </div>
+
+          <button type="submit" id="add-btn">Add Task</button>
+
+        </form>
+      </section>
+
+      <!-- ── Task Counter ── -->
+      <section class="dashboard">
+        <p id="total-count">Total Tasks: 0</p>
+      </section>
+
+      <!-- ── Task List (cards rendered by script.js) ── -->
+      <section
+        class="task-list"
+        id="task-list"
+        aria-live="polite"
+        aria-label="Study task list"
+      ></section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

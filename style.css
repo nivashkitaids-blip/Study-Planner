@@ -1,0 +1,278 @@
+/* =============================================================
+   Smart Study Planner — style.css
+   Clean, simple, student-friendly UI.
+   No external libraries. No glassmorphism. No animations > 300ms.
+   ============================================================= */
+
+/* ── CSS Custom Properties (color palette) ── */
+:root {
+  --color-bg:            #f0f4f8;
+  --color-surface:       #ffffff;
+  --color-primary:       #4a90d9;
+  --color-primary-hover: #357abd;
+  --color-danger:        #e05252;
+  --color-danger-hover:  #c43c3c;
+  --color-success:       #4caf7d;
+  --color-success-hover: #3a9165;
+  --color-undo:          #78909c;
+  --color-undo-hover:    #546e7a;
+  --color-text:          #2c3e50;
+  --color-text-muted:    #6b7c93;
+  --color-border:        #d1dbe8;
+  --color-done-bg:       #f7f9fb;
+  --radius:              10px;
+  --shadow:              0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ── Centered container ── */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* ── Form section ── */
+.form-section {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-text);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 44px;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+input[type="text"]::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── Add Task button ── */
+#add-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color 0.2s;
+}
+
+#add-btn:hover,
+#add-btn:focus-visible {
+  background-color: var(--color-primary-hover);
+}
+
+/* ── Dashboard (task counter) ── */
+.dashboard {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+#total-count {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Task list container ── */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Task card ── */
+.task-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Completed card — muted look */
+.task-card.completed {
+  background: var(--color-done-bg);
+  opacity: 0.85;
+}
+
+.task-card.completed .task-title {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+/* Subject tag */
+.task-subject {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
+
+/* Task title */
+.task-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+/* Card action buttons row */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Shared button base */
+.btn-complete,
+.btn-delete {
+  padding: 8px 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color 0.2s;
+}
+
+/* Complete button */
+.btn-complete {
+  background-color: var(--color-success);
+  color: #fff;
+}
+
+.btn-complete:hover,
+.btn-complete:focus-visible {
+  background-color: var(--color-success-hover);
+}
+
+/* Undo variant */
+.btn-complete.undo {
+  background-color: var(--color-undo);
+}
+
+.btn-complete.undo:hover,
+.btn-complete.undo:focus-visible {
+  background-color: var(--color-undo-hover);
+}
+
+/* Delete button */
+.btn-delete {
+  background-color: var(--color-danger);
+  color: #fff;
+}
+
+.btn-delete:hover,
+.btn-delete:focus-visible {
+  background-color: var(--color-danger-hover);
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ── Responsive layout ── */
+
+/* Mobile: stack buttons full-width below 480px */
+@media (max-width: 479px) {
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .btn-complete,
+  .btn-delete {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Desktop: ensure container is nicely centered */
+@media (min-width: 768px) {
+  body {
+    padding: 40px 24px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+}

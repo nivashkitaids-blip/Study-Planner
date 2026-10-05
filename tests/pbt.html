@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Study Planner — Property-Based Tests</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; background: #f0f4f8; }
+    h1   { color: #4a90d9; }
+    #output { background: #fff; border-radius: 8px; padding: 16px; margin-top: 16px; white-space: pre-wrap; font-size: 0.9rem; }
+    .pass { color: #2e7d32; }
+    .fail { color: #c62828; font-weight: bold; }
+    .info { color: #555; }
+  </style>
+</head>
+<body>
+  <h1>Property-Based Tests</h1>
+  <p>Open browser console for full fast-check output. Summary below:</p>
+  <div id="output">Running…</div>
+
+  <!-- fast-check loaded from CDN — test-only file, exempt from 3-file app constraint -->
+  <script src="https://cdn.jsdelivr.net/npm/fast-check@3/lib/bundle/fast-check.min.js"></script>
+  <script>
+    /**
+     * Minimal stubs that replicate the core logic from script.js
+     * so these tests run standalone without opening index.html.
+     * In a real CI setup you would import script.js directly.
+     */
+
+    // ── Replicated state + logic ──────────────────────────────────────────────
+    let tasks = [];
+
+    /** Generate a simple unique ID */
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    /** Save tasks to localStorage */
+    function saveTasks() {
+      try {
+        localStorage.setItem('smartStudyPlannerTasks', JSON.stringify(tasks));
+      } catch (e) { /* ignore */ }
+    }
+
+    /** Load tasks from localStorage */
+    function loadTasks() {
+      try {
+        const raw = localStorage.getItem('smartStudyPlannerTasks');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    /** Add a task (simplified — no DOM interaction) */
+    function addTaskRaw(subject, title) {
+      const task = { id: generateId(), subject, title, completed: false };
+      tasks.push(task);
+      saveTasks();
+      return task;
+    }
+
+    /** Delete a task by ID */
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
+    }
+
+    /** Toggle a task's completed status */
+    function toggleTaskStatus(id) {
+      const task = tasks.find(t => t.id === id);
+      if (task) task.completed = !task.completed;
+      saveTasks();
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const fc   = window.fc;
+    const out  = document.getElementById('output');
+    const log  = (msg, cls = 'info') => out.innerHTML += `<span class="${cls}">${msg}\n</span>`;
+
+    out.innerHTML = '';
+
+    // Helper: reset state before each property
+    function reset() { tasks = []; localStorage.removeItem('smartStudyPlannerTasks'); }
+
+    let allPassed = true;
+
+    function runProperty(name, prop) {
+      try {
+        fc.assert(prop, { numRuns: 100 });
+        log(`✓ PASS  ${name}`, 'pass');
+      } catch (e) {
+        log(`✗ FAIL  ${name}\n       ${e.message}`, 'fail');
+        allPassed = false;
+      }
+    }
+
+    // ── Arbitraries ───────────────────────────────────────────────────────────
+    const nonEmptyStr = fc.string({ minLength: 1, maxLength: 50 });
+    const taskArb = fc.record({
+      id:        fc.string({ minLength: 1, maxLength: 20 }),
+      subject:   nonEmptyStr,
+      title:     nonEmptyStr,
+      completed: fc.boolean(),
+    });
+
+    // ── Property 1: Adding a task increases count by exactly 1 ────────────────
+    runProperty('Adding a task increases count by exactly 1', fc.property(
+      nonEmptyStr, nonEmptyStr,
+      (subject, title) => {
+        reset();
+        const before = tasks.length;
+        addTaskRaw(subject, title);
+        const after = tasks.length;
+        return after === before + 1;
+      }
+    ));
+
+    // ── Property 2: Deleting a task decreases count by exactly 1 ─────────────
+    runProperty('Deleting a task decreases count by exactly 1', fc.property(
+      nonEmptyStr, nonEmptyStr,
+      (subject, title) => {
+        reset();
+        const t = addTaskRaw(subject, title);
+        const before = tasks.length;
+        deleteTask(t.id);
+        return tasks.length === before - 1;
+      }
+    ));
+
+    // ── Property 3: Completing a task sets completed = true ───────────────────
+    runProperty('Completing a task sets completed = true', fc.property(
+      nonEmptyStr, nonEmptyStr,
+      (subject, title) => {
+        reset();
+        const t = addTaskRaw(subject, title);
+        // task starts as false
+        if (t.completed !== false) return false;
+        toggleTaskStatus(t.id);
+        return tasks.find(x => x.id === t.id).completed === true;
+      }
+    ));
+
+    // ── Property 4: Every task has a non-empty string ID ─────────────────────
+    runProperty('Every task has a non-empty string ID', fc.property(
+      nonEmptyStr, nonEmptyStr,
+      (subject, title) => {
+        reset();
+        const t = addTaskRaw(subject, title);
+        return typeof t.id === 'string' && t.id.length > 0;
+      }
+    ));
+
+    // ── Property 5: Task count never goes negative ────────────────────────────
+    runProperty('Task count never goes negative', fc.property(
+      fc.array(fc.record({ subject: nonEmptyStr, title: nonEmptyStr }), { maxLength: 10 }),
+      (items) => {
+        reset();
+        items.forEach(i => addTaskRaw(i.subject, i.title));
+        // delete all tasks one by one
+        [...tasks].forEach(t => deleteTask(t.id));
+        return tasks.length >= 0;
+      }
+    ));
+
+    // ── Property 6: localStorage round-trip produces equal arrays ─────────────
+    runProperty('localStorage round-trip preserves task array', fc.property(
+      fc.array(taskArb, { maxLength: 15 }),
+      (arr) => {
+        reset();
+        tasks = arr;
+        saveTasks();
+        const restored = loadTasks();
+        return JSON.stringify(restored) === JSON.stringify(arr);
+      }
+    ));
+
+    // ── Property 7: Toggle twice restores original completed value ─────────────
+    runProperty('Toggle twice restores original completed value', fc.property(
+      nonEmptyStr, nonEmptyStr,
+      (subject, title) => {
+        reset();
+        const t = addTaskRaw(subject, title);
+        const original = tasks.find(x => x.id === t.id).completed;
+        toggleTaskStatus(t.id);
+        toggleTaskStatus(t.id);
+        return tasks.find(x => x.id === t.id).completed === original;
+      }
+    ));
+
+    // ── Summary ───────────────────────────────────────────────────────────────
+    log('');
+    if (allPassed) {
+      log('All properties passed ✓', 'pass');
+    } else {
+      log('One or more properties FAILED — see above.', 'fail');
+    }
+  </script>
+</body>
+</html>

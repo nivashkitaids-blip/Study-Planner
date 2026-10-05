@@ -1,0 +1,9 @@
+{
+  "id": "check-app-files",
+  "name": "Check App File Structure",
+  "description": "After any app file is edited or created, verifies that index.html, style.css, and script.js all exist, that index.html correctly references style.css and script.js, and that no extra application source files have been added outside the .kiro directory.",
+  "eventType": "fileEdited",
+  "hookAction": "askAgent",
+  "filePatterns": "index.html,style.css,script.js",
+  "outputPrompt": "A Smart Study Planner application file was just edited. Please do the following checks and report any issues found:\n\n1. **File existence**: Confirm that all three required files exist in the project root: `index.html`, `style.css`, and `script.js`.\n\n2. **HTML references**: Open `index.html` and verify:\n   - There is a `<link rel=\"stylesheet\" href=\"style.css\">` tag inside `<head>`.\n   - There is a `<script src=\"script.js\"></script>` tag before `</body>`.\n   - No other external CSS or JS files are referenced (CDN links in production files are not allowed).\n\n3. **Extra file check**: Check the project root for any application source files beyond the three allowed ones (e.g., `app.js`, `utils.js`, `components/`, `src/`). Files inside `.kiro/` are exempt.\n\nReport any violations clearly. If everything is correct, confirm 'All checks passed'."
+}
