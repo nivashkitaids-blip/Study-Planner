@@ -1,0 +1,23 @@
+{
+  "name": "study-planner-reviewer-power",
+  "displayName": "Study Planner Reviewer Power",
+  "version": "1.0.0",
+  "description": "A Kiro Power that bundles the Study Planner Reviewer agent, steering rules, and MCP filesystem access to review and validate the Smart Study Planner project.",
+  "keywords": [
+    "review",
+    "validate",
+    "study-planner",
+    "html",
+    "css",
+    "javascript",
+    "three-file",
+    "docs",
+    "documentation"
+  ],
+  "skills": [
+    "skills/review-skill.md"
+  ],
+  "steering": [
+    "steering/vanilla-only.md"
+  ]
+}
